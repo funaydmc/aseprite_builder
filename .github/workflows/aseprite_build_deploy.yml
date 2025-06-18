@@ -9,7 +9,7 @@ on:
 
 env:
   BUILD_TYPE: Release
-  
+
 jobs:
   check-version:
     name: Check latest Aseprite release
@@ -34,7 +34,7 @@ jobs:
         echo "::set-output name=version_info::${VERSION_INFO}"
     - name: Load version from cache
       id: version_check
-      uses: actions/cache@v2
+      uses: actions/cache@v3  # Updated to v3
       with:
         path: ${{ steps.version_info.outputs.latest_tag }}.txt
         key: cached_version
@@ -77,7 +77,7 @@ jobs:
         run: brew install ninja p7zip
       - name: Get Skia from cache
         id: skia-cache
-        uses: actions/cache@v2
+        uses: actions/cache@v3  # Updated to v3
         with:
           path: skia
           key: skia-${{ matrix.os }}-cache
@@ -102,7 +102,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         working-directory: aseprite/build
         shell: cmd
-        run: cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_IGNORE_PATH='C:/ProgramData/chocolatey/bin/;C:/Strawberry/c/bin/' -DLAF_BACKEND=skia -DSKIA_DIR=../../skia -DSKIA_LIBRARY_DIR=../../skia/out/Release-x64 -G Ninja ..
+        run: cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_IGNORE_PATH='C:/ProgramData/chocolatey/bin/;C:/Strawberry/c/bin/' -DLAF_BACKEND=skia -DSKIA_DIR=../../skia -DSKIA_LIBRARY_DIR=.[...]
       - name: (Ubuntu) Run CMake
         if: matrix.os == 'ubuntu-latest'
         working-directory: aseprite/build
@@ -110,7 +110,7 @@ jobs:
       - name: (macOS) Run CMake
         if: matrix.os == 'macOS-latest'
         working-directory: aseprite/build
-        run: cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.15.sdk -DLAF_BACKEND=skia -DSKIA_DIR=../../skia -DSKIA_LIBRARY_DIR=../../skia/out/Release-x64 -G Ninja ..
+        run: cmake -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -DCMAKE_OSX_ARCHITECTURES=x86_64 -DCMAKE_OSX_DEPLOYMENT_TARGET=10.9 -DCMAKE_OSX_SYSROOT=/Applications/Xcode.app/Contents/Developer/Plat[...]
       - name: Run Ninja
         working-directory: aseprite/build
         run: ninja aseprite
@@ -133,4 +133,3 @@ jobs:
           asset_path: aseprite/build/bin/Aseprite-${{ needs.check-version.outputs.latest_tag }}-${{ runner.os }}.zip
           asset_name: Aseprite-${{ needs.check-version.outputs.latest_tag }}-${{ runner.os }}.zip
           asset_content_type: application/zip
-
