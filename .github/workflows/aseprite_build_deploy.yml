@@ -27,12 +27,19 @@ jobs:
         data=$(curl -sL https://api.github.com/repos/aseprite/aseprite/releases/latest)
         LATEST_TAG=$(echo "${data}" | jq -r '.tag_name')
         DOWNLOAD_URL=$(echo "${data}" | jq -r '.assets[].browser_download_url')
-        VERSION_INFO=$(echo "${data}" | jq -r '.body')
+        # Capture the raw body content which can be multiline
+        RAW_VERSION_BODY=$(echo "${data}" | jq -r '.body')
 
         echo "${LATEST_TAG}" > ${LATEST_TAG}.txt
         echo "latest_tag=${LATEST_TAG}" >> $GITHUB_OUTPUT
         echo "download_url=${DOWNLOAD_URL}" >> $GITHUB_OUTPUT
-        echo "version_info=${VERSION_INFO}" >> $GITHUB_OUTPUT
+
+        # Handle multiline VERSION_INFO for output using a custom delimiter.
+        # This ensures that the multiline content is correctly passed as an output.
+        DELIMITER=$(uuidgen) # Generate a unique delimiter
+        echo "version_info<<EOF_${DELIMITER}" >> $GITHUB_OUTPUT
+        echo "${RAW_VERSION_BODY}" >> $GITHUB_OUTPUT
+        echo "EOF_${DELIMITER}" >> $GITHUB_OUTPUT
     - name: Load version from cache
       id: version_check
       uses: actions/cache@v3
